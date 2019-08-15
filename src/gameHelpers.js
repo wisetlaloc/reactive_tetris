@@ -21,3 +21,5 @@ export const checkCollision = (player, stage, { x: moveX, y: moveY }) => {
     }
   }
 }
+
+export const leveledDropTime = level => { return 1000 / level + 200 }
