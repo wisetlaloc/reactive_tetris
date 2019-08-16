@@ -16,6 +16,7 @@ export const useGameStatus = (rowsCleared) => {
     if (rowsCleared > 0) {
       const linePoints = [40, 100, 300, 1200];
       setScore(prev => prev + linePoints[rowsCleared - 1] * level);
+      console.log("calc score");
       setRows(prev => prev + rowsCleared);
       if (rows > level * 10) {
         setLevel(prev => prev + 1);
@@ -27,6 +28,7 @@ export const useGameStatus = (rowsCleared) => {
   const resetGameStatus = () => {
     setGameOver(INITIAL_GAME_STATUS.gameOver);
     setScore(INITIAL_GAME_STATUS.score);
+    console.log('reset');
     setRows(INITIAL_GAME_STATUS.rows);
     setLevel(INITIAL_GAME_STATUS.level);
     setDropTime(leveledDropTime(level));
@@ -41,5 +43,5 @@ export const useGameStatus = (rowsCleared) => {
     calcScore();
   }, [calcScore, rowsCleared, score]);
 
-  return [score, rows, level, dropTime, setDropTime, gameOver, resetGameStatus, gameOverStatus];
+  return [score, rows, level, dropTime, gameOver, resetGameStatus, gameOverStatus];
 }

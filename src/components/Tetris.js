@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { createStage, leveledDropTime } from '../gameHelpers';
+import { createStage } from '../gameHelpers';
 
 // Styled Components
 import { StyledTetrisWrapper, StyledTetris } from './styles/StyledTetris'
@@ -15,24 +15,17 @@ import { useGameStatus } from '../hooks/useGameStatus';
 import Stage from './Stage';
 import Display from './Display';
 import StartButton from './StartButton';
+import WaitingArea from './WaitingArea';
 
 const Tetris = () => {
-  const [player, resetPlayer, movePlayer, drop, stopGame, stopClock] = usePlayer();
+  const [player, resetPlayer, movePlayer, drop, nextPlayer, stopGame] = usePlayer();
   const [stage, setStage, rowsCleared] = useStage(player, resetPlayer);
-  const [score, rows, level, dropTime, setDropTime, gameOver, resetGameStatus] = useGameStatus(rowsCleared);
+  const [score, rows, level, dropTime, gameOver, resetGameStatus, gameOverStatus] = useGameStatus(rowsCleared);
 
   const startGame = () => {
     setStage(createStage());
-    resetPlayer();
+    resetPlayer(true);
     resetGameStatus();
-  }
-
-  const keyUp = ({ keyCode }) => {
-    if (!gameOver) {
-      if (keyCode === 40 || keyCode === 68) {
-        setDropTime(leveledDropTime(level));
-      }
-    }
   }
 
   const move = ({ keyCode }) => {
@@ -43,16 +36,13 @@ const Tetris = () => {
 
   useInterval(() => {
     if (stopGame) {
-      resetGameStatus();
-    }
-    if (stopClock) {
-      setDropTime(null);
+      gameOverStatus();
     }
     drop(stage);
   }, dropTime);
 
   return (
-    <StyledTetrisWrapper role="button" tabIndex="0" onKeyDown={e => move(e)} onKeyUp={keyUp}>
+    <StyledTetrisWrapper role="button" tabIndex="0" onKeyDown={e => move(e)} >
       <StyledTetris>
         <Stage stage={stage} />
         <aside>
@@ -60,13 +50,12 @@ const Tetris = () => {
             gameOver ? (
               <Display gameOver={gameOver} text="Game Over" />
             ) : (
-                <div>
-                  <Display text={`Score: ${score}`} />
-                  <Display text={`Rows: ${rows} `} />
-                  <Display text={`Level: ${level}`} />
-                </div>
+                <WaitingArea nextTetraminos={nextPlayer} />
               )
           }
+          <Display text={`Score: ${score}`} />
+          <Display text={`Rows: ${rows} `} />
+          <Display text={`Level: ${level}`} />
           <StartButton callback={startGame} />
         </aside>
       </StyledTetris>

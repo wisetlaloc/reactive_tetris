@@ -9,7 +9,7 @@ export const usePlayer = () => {
     tetromino: TETROMINOS[0].shape,
     collided: false,
   });
-  const [stopClock, setStopClock] = useState(false);
+  const [nextPlayer, setNextPlayer] = useState(randomTetromino().shape);
   const [stopGame, setStopGame] = useState(false);
 
   const updatePlayerPos = ({ x, y, collided }) => {
@@ -20,13 +20,17 @@ export const usePlayer = () => {
     }))
   }
 
-  const resetPlayer = useCallback(() => {
+  const resetPlayer = useCallback((newGameFlag) => {
     setPlayer({
       pos: { x: STAGE_WIDTH / 2 - 2, y: 0 },
-      tetromino: randomTetromino().shape,
+      tetromino: nextPlayer,
       collided: false,
-    })
-  }, [])
+    });
+    setNextPlayer(randomTetromino().shape);
+    if (newGameFlag) {
+      setStopGame(false);
+    }
+  }, [nextPlayer])
 
   const movePlayer = (keyCode, stage) => {
     if (keyCode === KEYCODES.left) {
@@ -51,7 +55,6 @@ export const usePlayer = () => {
   }
 
   const dropPlayer = (stage) => {
-    setStopClock(true);
     drop(stage);
   }
 
@@ -67,7 +70,6 @@ export const usePlayer = () => {
   }
 
   const hardDropPlayer = (stage) => {
-    setStopClock(true);
     hardDrop(stage);
   }
 
@@ -97,5 +99,5 @@ export const usePlayer = () => {
     setPlayer(dupPlayer);
   }
 
-  return [player, resetPlayer, movePlayer, drop, stopClock, stopGame];
+  return [player, resetPlayer, movePlayer, drop, nextPlayer, stopGame];
 }
