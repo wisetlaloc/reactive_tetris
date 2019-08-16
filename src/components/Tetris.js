@@ -48,14 +48,14 @@ const Tetris = () => {
         <aside>
           {
             gameOver ? (
-              <Display gameOver={gameOver} text="Game Over" />
+              <Display gameOver={gameOver} label="Game Over" />
             ) : (
                 <WaitingArea nextTetraminos={nextPlayer} />
               )
           }
-          <Display text={`Score: ${score}`} />
-          <Display text={`Rows: ${rows} `} />
-          <Display text={`Level: ${level}`} />
+          <Display label="Score:" value={score} />
+          <Display label="Rows:" value={rows} />
+          <Display label="Level:" value={level} />
           <StartButton callback={startGame} />
         </aside>
       </StyledTetris>
