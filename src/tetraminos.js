@@ -64,3 +64,12 @@ export const randomTetromino = () => {
     tetrominos[Math.floor(Math.random() * tetrominos.length)];
   return TETROMINOS[randTetrominos];
 }
+
+export const rotatedTetromino = (matrix, dir) => {
+  const transposedTetromino = matrix.map((_, index) =>
+    matrix.map(col => col[index]),
+  );
+  if (dir > 0) return transposedTetromino.reverse();
+
+  return transposedTetromino.map(row => row.reverse());
+}

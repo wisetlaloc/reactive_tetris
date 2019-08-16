@@ -23,3 +23,14 @@ export const checkCollision = (player, stage, { x: moveX, y: moveY }) => {
 }
 
 export const leveledDropTime = level => { return 1000 / level + 200 }
+
+export const KEYCODES = {
+  left: 37,
+  right: 39,
+  down: 40,
+  d: 68,
+  x: 38,
+  up: 88,
+  z: 17,
+  control: 90
+}

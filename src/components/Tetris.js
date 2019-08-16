@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-import { createStage, checkCollision, leveledDropTime } from '../gameHelpers';
+import { createStage, leveledDropTime } from '../gameHelpers';
 
 // Styled Components
 import { StyledTetrisWrapper, StyledTetris } from './styles/StyledTetris'
@@ -17,43 +17,14 @@ import Display from './Display';
 import StartButton from './StartButton';
 
 const Tetris = () => {
-  const [dropTime, setDropTime] = useState(null);
-  const [gameOver, setGameOver] = useState(false);
-
-  const [player, updatePlayerPos, resetPlayer, playerRotate] = usePlayer();
+  const [player, resetPlayer, movePlayer, drop, stopGame, stopClock] = usePlayer();
   const [stage, setStage, rowsCleared] = useStage(player, resetPlayer);
-  const [score, setScore, rows, setRows, level, setLevel] = useGameStatus(rowsCleared);
-
-  const movePlayer = dir => {
-    if (!checkCollision(player, stage, { x: dir, y: 0 })) {
-      updatePlayerPos({ x: dir, y: 0 });
-    }
-  }
+  const [score, rows, level, dropTime, setDropTime, gameOver, resetGameStatus] = useGameStatus(rowsCleared);
 
   const startGame = () => {
     setStage(createStage());
     resetPlayer();
-    setGameOver(false);
-    setScore(0);
-    setRows(0);
-    setLevel(1);
-    setDropTime(leveledDropTime(level));
-  }
-
-  const drop = () => {
-    if (rows > level * 10) {
-      setLevel(prev => prev + 1);
-      setDropTime(leveledDropTime(level));
-    }
-    if (!checkCollision(player, stage, { x: 0, y: 1 })) {
-      updatePlayerPos({ x: 0, y: 1, collided: false });
-    } else {
-      if (player.pos.y < 1) {
-        setGameOver(true);
-        setDropTime(null);
-      }
-      updatePlayerPos({ x: 0, y: 0, collided: true });
-    }
+    resetGameStatus();
   }
 
   const keyUp = ({ keyCode }) => {
@@ -64,44 +35,20 @@ const Tetris = () => {
     }
   }
 
-  const dropPlayer = () => {
-    setDropTime(null);
-    drop();
-  }
-
-  const hardDrop = () => {
-    let dropLimit = 0;
-    while (!checkCollision(player, stage, { x: 0, y: dropLimit + 1 })) {
-      dropLimit += 1;
-    }
-    updatePlayerPos({ x: 0, y: dropLimit, collided: false });
-  }
-
-  const hardDropPlayer = () => {
-    setDropTime(null);
-    hardDrop();
-  }
-
   const move = ({ keyCode }) => {
     if (!gameOver) {
-      if (keyCode === 37) {
-        movePlayer(-1);
-      } else if (keyCode === 39) {
-        movePlayer(1);
-      } else if (keyCode === 40) {
-        dropPlayer();
-      } else if (keyCode === 68) {
-        hardDropPlayer();
-      } else if (keyCode === 38 || keyCode === 88) {
-        playerRotate(stage, -1);
-      } else if (keyCode === 17 || keyCode === 90) {
-        playerRotate(stage, 1);
-      }
+      movePlayer(keyCode, stage);
     }
   }
 
   useInterval(() => {
-    drop();
+    if (stopGame) {
+      resetGameStatus();
+    }
+    if (stopClock) {
+      setDropTime(null);
+    }
+    drop(stage);
   }, dropTime);
 
   return (
